@@ -3,29 +3,31 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <title>chat-demo</title>
-    <script type="text/javascript" src="/static/jquery.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <script src="https://code.jquery.com/jquery-2.2.1.min.js" type="text/javascript"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
     <script type="text/javascript">
       var websocket
       $(document).ready(init)
 
       function init() {
-        $('#server').val("ws://" + window.location.host + "/websocket")
-        if (!("WebSocket" in window)) {
+        $('#server').val('ws://' + window.location.host + '/websocket')
+        if (!('WebSocket' in window)) {
           $('#status').append('<p><span style="color: red;">websockets are not supported </span></p>')
-          $("#navigation").hide()
+          $('#navigation').hide()
         } else {
           $('#status').append('<p><span style="color: green;">websockets are supported </span></p>')
           connect()
         }
-        $("#nick_name").hide()
-        $("#connected").hide()
-        $("#content").hide()
+        $('#nick').hide()
+        $('#msg').hide()
+        $('#content').hide()
       }
 
       function connect() {
-        wsHost = $("#server").val()
+        wsHost = $('#server').val()
         websocket = new WebSocket(wsHost)
-        showScreen('<b>Connecting to: ' +  wsHost + '</b>')
+        prependRow('STATUS', 'orange', '', '<b>Connecting to: ' +  wsHost + '</b>')
         websocket.onopen = function(evt) { onOpen(evt) }
         websocket.onclose = function(evt) { onClose(evt) }
         websocket.onmessage = function(evt) { onMessage(evt) }
@@ -34,6 +36,7 @@
 
       function disconnect() {
         websocket.close()
+        $('#send_nick').val('')
       }
 
       function toggle_connection() {
@@ -45,65 +48,78 @@
       }
 
       function sendTxt() {
+        var send_txt = $('#send_txt')
+        var msg = send_txt.val()
+        if (msg === '') { return }
         if (websocket.readyState == websocket.OPEN) {
-          txt = "msg ! " + $("#send_txt").val()
-          websocket.send(txt)
+          websocket.send('msg ! ' + msg)
+          send_txt.val('')
         } else {
-          showScreen('websocket is not connected')
+          prependRow('STATUS', 'orange', '', 'websocket is not connected')
         }
       }
 
       function sendNick() {
+        var nick = $('#send_nick').val()
+        if (nick === '') { return }
         if (websocket.readyState == websocket.OPEN) {
-          txt = "nick ! " + $("#send_nick").val()
-          websocket.send(txt)
+          websocket.send('nick ! ' + nick)
+          $('#nick').hide()
+          $('#msg').fadeIn('slow')
+          $('#send_txt').focus()
         } else {
-          showScreen('websocket is not connected')
+          prependRow('STATUS', 'orange', '', 'websocket is not connected')
         }
       }
 
       function onOpen(evt) {
-        showScreen('<span style="color: green;">CONNECTED </span>')
-        $("#nick_name").fadeIn('slow')
-        $("#connected").fadeIn('slow')
-        $("#content").fadeIn('slow')
+        prependRow('STATUS', 'green', '', 'CONNECTED')
+        $('#toggle_connection').val('Disconnect')
+        if ($('#send_nick').val() === '') {
+          $('#nick').fadeIn('slow')
+          $('#send_nick').focus()
+        } else {
+          $('#msg').fadeIn('slow')
+          $('#send_txt').focus()
+        }
+        $('#content').fadeIn('slow')
       }
 
       function onClose(evt) {
-        showScreen('<span style="color: red;">DISCONNECTED </span>')
+        prependRow('STATUS', 'red', '', 'DISCONNECTED')
+        $('#toggle_connection').val('Connect')
+        $('#nick').fadeOut('slow')
+        $('#msg').fadeOut('slow')
       }
 
       function onMessage(evt) {
-        var data = evt.data
-        var i = data.indexOf(" ! ")
-        var tag = data.slice(0, i)
-        var type = ""
-        var color = ""
-        if (tag == "output") {
-          type = "MSG: "
-          color = "blue"
-          data = data.slice(i+3)
-        } else if (tag == "status") {
-          type = "STATUS: "
-          color = "orange"
-          data = data.slice(i+3)
-        } else {
-          type = "SERVER: "
-          color = "red"
+        var [tag, data] = evt.data.match(/(.*) ! (.*)/).slice(1)
+        switch (tag) {
+        case 'output':
+          console.log('Data: ' + data)
+          var [sender, msg] = /(.*): (.*)/.exec(data).slice(1)
+          console.log('Sender: ' + sender + '\nMessage: ' + msg)
+          return prependRow('MSG', 'blue', sender, msg)
+        case 'status':
+          return prependRow('STATUS', 'orange', '', data)
+        default:
+          return prependRow('SERVER', 'red', '', data)
         }
-        showScreen('<span style="color: ' + color + ';">' + type + data + '</span>')
       }
 
       function onError(evt) {
-        showScreen('<span style="color: red;">ERROR: ' + evt.data+ '</span>')
+        prependRow('ERROR', 'red', '', evt.data)
       }
 
-      function showScreen(txt) {
-        $('#output').prepend('<p>' + txt + '</p>')
+      function clearMessages() {
+        $('#messages').html('')
       }
 
-      function clearScreen() {
-        $('#output').html("")
+      function prependRow(type, color, sender, data) {
+        $('#messages')
+          .prepend('<tr><td><span style="color: ' + color + ';">' + type
+                   + '</span></td><td>' + sender + '</td><td>' + data
+                   + '</td></tr>')
       }
     </script>
   </head>
@@ -114,30 +130,33 @@
       <div id="status"></div>
     </div>
 
-
     <div id="navigation">
       <form id="connecting" action="JavaScript:toggle_connection()">
 	<input type="text" id="server" value="">
-	<button type="button" onclick="toggle_connection()">connection</button>
+	<input type="submit" id="toggle_connection" value="Disconnect">
       </form>
-      <div id="connected">
+
+      <div id="nick">
+	<form action="JavaScript:sendNick()">
+	  <input type="text" id="send_nick" value="" required autofocus>
+	  <input type="submit" value="nick">
+        </form>
+      </div>
+
+      <div id="msg">
 	<form action="JavaScript:sendTxt()">
-	  <input type="text" id="send_txt" value="" required autofocus>
+	  <input type="text" id="send_txt" value="" required>
 	  <input type="submit" value="msg">
 	</form>
       </div>
-      <div id="nick_name">
-	<form action="JavaScript:sendNick()">
-	  <input type="text" id="send_nick" value="" required>
-	  <input type="submit" value="nick">
-</p>
-</div>
 
-<div id="content">
-  <button id="clear" onclick="clearScreen()">Clear text</button>
-  <div id="output"></div>
-</div>
+      <div id="content">
+        <form action="JavaScript:clearMessages()">
+          <input id="clear" type="submit" value="Clear messages">
+        </form>
+        <table class="table table-hover" id="messages"></table>
+      </div>
 
-</div>
-</body>
+    </div>
+  </body>
 </html>
