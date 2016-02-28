@@ -1,0 +1,16 @@
+%% -*- erlang -*-
+%% Feel free to use, reuse and abuse the code in this file.
+
+{application,    'chat-demo',
+ [{description,  "Elli chat demo."},
+  {vsn,          "0.0.1"},
+  {registered,   []},
+  {applications, [kernel, stdlib, crypto]},
+  {mod,          {'chat-demo-app', []}},
+  {env,          []},
+  {modules,      []},
+
+  {contributors, ["Robert Virding", "Eric Bailey"]},
+  {licenses,     ["BSD 2-Clause"]},
+  {links,        [{"GitHub", "https://github.com/yurrriq/chat-demo"},
+                  {"Original", "https://github.com/rvirding/chat_demo"}]}]}.

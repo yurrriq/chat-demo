@@ -1,0 +1,40 @@
+#+OPTIONS: toc:nil ^:{}
+
+* chat-demo
+A very simple chat demo that uses websockets.
+[[https://github.com/rvirding][Robert]] used it in a QCon presentation.
+It uses [[https://github.com/knutin/elli][elli]] and JQuery.
+
+** Building
+#+BEGIN_SRC bash
+$ rebar3 release
+#+END_SRC
+or
+#+BEGIN_SRC bash
+$ rebar3 as prod release
+#+END_SRC
+or just
+#+BEGIN_SRC bash
+$ rebar3 compile
+#+END_SRC
+
+** Usage
+Start a =chat-demo= release with an Erlang shell:
+#+BEGIN_SRC bash
+$ ./_build/{default,prod}/rel/chat-demo/bin/chat-demo console
+#+END_SRC
+
+If you've already compiled =chat-demo=:
+#+BEGIN_SRC lfe
+> (chat-demo:start)
+ok
+#+END_SRC
+or
+#+BEGIN_SRC bash
+lfe -s chat-demo
+#+END_SRC
+
+You can then access the chat system from the browser by going to port 8080 on
+the current machine.
+
+NOTE: the browser front-end is severely lacking and needs much work.
