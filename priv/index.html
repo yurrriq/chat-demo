@@ -1,148 +1,143 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <title>Websocket client</title>
-    <script src="/static/jquery.min.js"></script>
+    <title>chat-demo</title>
+    <script type="text/javascript" src="/static/jquery.min.js"></script>
     <script type="text/javascript">
-      
-      var websocket;
-      $(document).ready(init);
-      
+      var websocket
+      $(document).ready(init)
+
       function init() {
-          $('#server').val("ws://" + window.location.host + "/websocket");
-          if(!("WebSocket" in window)){  
-              $('#status').append('<p><span style="color: red;">websockets are not supported </span></p>');
-              $("#navigation").hide();  
-          } else {
-              $('#status').append('<p><span style="color: green;">websockets are supported </span></p>');
-              connect();
-          };
-              $("#nick_name").hide(); 	
-              $("#connected").hide(); 	
-              $("#content").hide(); 	
-      };
+        $('#server').val("ws://" + window.location.host + "/websocket")
+        if (!("WebSocket" in window)) {
+          $('#status').append('<p><span style="color: red;">websockets are not supported </span></p>')
+          $("#navigation").hide()
+        } else {
+          $('#status').append('<p><span style="color: green;">websockets are supported </span></p>')
+          connect()
+        }
+        $("#nick_name").hide()
+        $("#connected").hide()
+        $("#content").hide()
+      }
 
-      function connect()
-      {
-          wsHost = $("#server").val()
-          websocket = new WebSocket(wsHost);
-          showScreen('<b>Connecting to: ' +  wsHost + '</b>'); 
-          websocket.onopen = function(evt) { onOpen(evt) }; 
-          websocket.onclose = function(evt) { onClose(evt) }; 
-          websocket.onmessage = function(evt) { onMessage(evt) }; 
-          websocket.onerror = function(evt) { onError(evt) }; 
-      };  
-      
+      function connect() {
+        wsHost = $("#server").val()
+        websocket = new WebSocket(wsHost)
+        showScreen('<b>Connecting to: ' +  wsHost + '</b>')
+        websocket.onopen = function(evt) { onOpen(evt) }
+        websocket.onclose = function(evt) { onClose(evt) }
+        websocket.onmessage = function(evt) { onMessage(evt) }
+        websocket.onerror = function(evt) { onError(evt) }
+      }
+
       function disconnect() {
-          websocket.close();
-      }; 
+        websocket.close()
+      }
 
-      function toggle_connection(){
-          if(websocket.readyState == websocket.OPEN){
-              disconnect();
-          } else {
-              connect();
-          };
-      };
+      function toggle_connection() {
+        if (websocket.readyState == websocket.OPEN) {
+          disconnect()
+        } else {
+          connect()
+        }
+      }
 
       function sendTxt() {
-          if(websocket.readyState == websocket.OPEN){
-              txt = "msg ! " + $("#send_txt").val();
-              websocket.send(txt);
-          } else {
-              showScreen('websocket is not connected'); 
-          };
-      };
+        if (websocket.readyState == websocket.OPEN) {
+          txt = "msg ! " + $("#send_txt").val()
+          websocket.send(txt)
+        } else {
+          showScreen('websocket is not connected')
+        }
+      }
 
       function sendNick() {
-          if(websocket.readyState == websocket.OPEN){
-              txt = "nick ! " + $("#send_nick").val();
-              websocket.send(txt);
-          } else {
-              showScreen('websocket is not connected'); 
-          };
-      };
+        if (websocket.readyState == websocket.OPEN) {
+          txt = "nick ! " + $("#send_nick").val()
+          websocket.send(txt)
+        } else {
+          showScreen('websocket is not connected')
+        }
+      }
 
-      function onOpen(evt) { 
-          showScreen('<span style="color: green;">CONNECTED </span>'); 
-          $("#nick_name").fadeIn('slow');
-          $("#connected").fadeIn('slow');
-          $("#content").fadeIn('slow');
-      };  
+      function onOpen(evt) {
+        showScreen('<span style="color: green;">CONNECTED </span>')
+        $("#nick_name").fadeIn('slow')
+        $("#connected").fadeIn('slow')
+        $("#content").fadeIn('slow')
+      }
 
-      function onClose(evt) { 
-          showScreen('<span style="color: red;">DISCONNECTED </span>');
-      };  
+      function onClose(evt) {
+        showScreen('<span style="color: red;">DISCONNECTED </span>')
+      }
 
-      function onMessage(evt) { 
-          var data = evt.data;
-          var i = data.indexOf(" ! ");
-	  var tag = data.slice(0, i);
-	  var type = "";
-	  var color = "";
-	  if (tag == "output") {
-	      type = "MSG: ";
-	      color = "blue";
-	      data = data.slice(i+3);
-	  }
-	  else if (tag == "status") {
-	      type = "STATUS: ";
-	      color = "orange";
-	      data = data.slice(i+3);
-	  }
-	  else {
-	      type = "SERVER: ";
-	      color = "red";
-	  }
-          showScreen('<span style="color: ' + color + ';">' + type + data + '</span>');
-      };  
+      function onMessage(evt) {
+        var data = evt.data
+        var i = data.indexOf(" ! ")
+        var tag = data.slice(0, i)
+        var type = ""
+        var color = ""
+        if (tag == "output") {
+          type = "MSG: "
+          color = "blue"
+          data = data.slice(i+3)
+        } else if (tag == "status") {
+          type = "STATUS: "
+          color = "orange"
+          data = data.slice(i+3)
+        } else {
+          type = "SERVER: "
+          color = "red"
+        }
+        showScreen('<span style="color: ' + color + ';">' + type + data + '</span>')
+      }
 
       function onError(evt) {
-          showScreen('<span style="color: red;">ERROR: ' + evt.data+ '</span>');
-      };
+        showScreen('<span style="color: red;">ERROR: ' + evt.data+ '</span>')
+      }
 
-      function showScreen(txt) { 
-          $('#output').prepend('<p>' + txt + '</p>');
-      };
+      function showScreen(txt) {
+        $('#output').prepend('<p>' + txt + '</p>')
+      }
 
-      function clearScreen() 
-      { 
-          $('#output').html("");
-      };
+      function clearScreen() {
+        $('#output').html("")
+      }
     </script>
   </head>
 
   <body>
     <div id="header">
-      <h1>Websocket client</h1>
+      <h1>chat-demo</h1>
       <div id="status"></div>
     </div>
 
 
     <div id="navigation">
-
-      <p id="connecting">
-	<input type='text' id="server" value=""></input>
+      <form id="connecting" action="JavaScript:toggle_connection()">
+	<input type="text" id="server" value="">
 	<button type="button" onclick="toggle_connection()">connection</button>
-      </p>
-      <div id="connected">				
-	<p>
-	  <input type='text' id="send_txt" value=></input>
-	  <button type="button" onclick="sendTxt();">msg</button>
-	</p>
+      </form>
+      <div id="connected">
+	<form action="JavaScript:sendTxt()">
+	  <input type="text" id="send_txt" value="" required autofocus>
+	  <input type="submit" value="msg">
+	</form>
       </div>
-      <div id="nick_name">				
-	<p>
-	  <input type='text' id="send_nick" value=></input>
-	  <button type="button" onclick="sendNick();">nick</button>
-	</p>
-      </div>
+      <div id="nick_name">
+	<form action="JavaScript:sendNick()">
+	  <input type="text" id="send_nick" value="" required>
+	  <input type="submit" value="nick">
+</p>
+</div>
 
-      <div id="content">						
-	<button id="clear" onclick="clearScreen()" >Clear text</button>
-	<div id="output"></div>
-      </div>
+<div id="content">
+  <button id="clear" onclick="clearScreen()">Clear text</button>
+  <div id="output"></div>
+</div>
 
-    </div>
-  </body>
-</html> 
+</div>
+</body>
+</html>
