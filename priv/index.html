@@ -93,11 +93,15 @@
       }
 
       function onMessage(evt) {
-        var [tag, data] = evt.data.match(/(.*) ! (.*)/).slice(1)
+        var tagData = evt.data.match(/(.*) ! (.*)/)
+        var tag     = tagData[1]
+        var data    = tagData[2]
         switch (tag) {
         case 'output':
           console.log('Data: ' + data)
-          var [sender, msg] = /(.*): (.*)/.exec(data).slice(1)
+          var senderMsg =  /(.*): (.*)/.exec(data)
+          var sender    = senderMsg[1]
+          var msg       = senderMsg[2]
           console.log('Sender: ' + sender + '\nMessage: ' + msg)
           return prependRow('MSG', 'blue', sender, msg)
         case 'status':
