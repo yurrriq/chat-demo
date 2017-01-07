@@ -33,7 +33,7 @@
 ;;;===================================================================
 
 (defun start ()
-  "Start the `chat-demo` application, ensuring its dependencies are started, too."
+  "Start the `chat_demo` application, ensuring its dependencies are started."
   (application:ensure_all_started (MODULE)))
 
 (defun stop ()

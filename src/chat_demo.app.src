@@ -1,11 +1,14 @@
 %% -*- erlang -*-
 %% Feel free to use, reuse and abuse the code in this file.
 
-{application,    'chat-demo',
+{application,    chat_demo,
  [{description,  "Elli chat demo."},
-  {vsn,          "0.0.1"},
+  {vsn,          "0.0.2"},
   {registered,   []},
-  {applications, [kernel, stdlib, crypto]},
+  {applications, [
+                  kernel, stdlib, crypto, lfe,
+                  elli, elli_fileserve, elli_websocket
+                 ]},
   {mod,          {'chat-demo-app', []}},
   {env,          []},
   {modules,      []},

@@ -31,6 +31,8 @@
   ;; Supervisor callback
   (export (init 1)))
 
+(defmacro APP () `'chat_demo)
+
 ;;;===================================================================
 ;;; API
 ;;;===================================================================
@@ -47,8 +49,8 @@
 (defun init
   "Return the supervisor flags and child specifications."
   ([()]
-   (let* ((path (application:get_env 'chat-demo 'path #"priv"))
-          (port (application:get_env 'chat-demo 'port 8080))
+   (let* ((path (application:get_env (APP) 'path #"priv"))
+          (port (application:get_env (APP) 'port 8080))
           (backend   (map 'id 'chat-server
                           'start #(chat-server start_link [])
                           'restart 'transient
@@ -66,7 +68,7 @@
                        #(callback_args ,config)
                        ;; TODO: Make port configurable.
                        #(port ,port)])
-          (elli-spec (map 'id       'chat-demo
+          (elli-spec (map 'id       (APP)
                           'start    `#(elli start_link [,elli-opts])
                           'restart  'permanent
                           'shutdown 5000
