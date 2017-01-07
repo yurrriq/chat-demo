@@ -19,12 +19,12 @@ $ rebar3 compile
 #+END_SRC
 
 ** Usage
-Start a =chat-demo= release with an Erlang shell:
+Start a =chat_demo= release with an Erlang shell:
 #+BEGIN_SRC bash
-$ ./_build/{default,prod}/rel/chat-demo/bin/chat-demo console
+$ ./_build/{default,prod}/rel/chat_demo/bin/chat_demo console
 #+END_SRC
 
-If you've already compiled =chat-demo=:
+If you've already compiled =chat_demo=:
 #+BEGIN_SRC lfe
 > (chat-demo:start)
 ok
